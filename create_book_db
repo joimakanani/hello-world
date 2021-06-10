@@ -1,0 +1,89 @@
+# ****************************************************************************************************
+#
+#       Name:          Joi Wilson
+#       Course:        COSC 2110 Computer Languages: Python
+#       Assignment:    create_PhoneBook.db.py
+#       Due Date:      11/25/2020
+#       Description:
+#                      The initial phonebook program
+#
+# ****************************************************************************************************
+
+import sqlite3
+from sqlite3 import Error
+
+
+# ****************************************************************************************************
+
+def connect(database):
+    connection = None
+
+    try:
+        connection = sqlite3.connect(database)
+        return connection
+    except Error as err:
+        print(err)
+    return connection
+
+
+# ****************************************************************************************************
+
+def createTable(connection, query):
+    try:
+        connection = connection.cursor()
+        connection.execute(query)
+    except Error as err:
+
+        print(err)
+
+    print("Table has been created successfully!")
+
+
+# ****************************************************************************************************
+
+def insertRows(database, tableName, rows):
+    connection = sqlite3.connect(database)
+    count = 0;
+
+    while count < len(rows):
+        cursor = connection.cursor()
+
+        connection.execute("INSERT INTO " + tableName + " (EntryID, Name, Phone) VALUES(?,?, ?)", \
+                           (rows[count][0], rows[count][1], rows[count][2]))
+
+        count = count + 1;
+
+    print("All Rows have been inserted!")
+
+    connection.commit()
+
+    connection.close()
+
+
+# ****************************************************************************************************
+
+def main():
+    database = "phoneBook.db"
+    tableName = "Entries"
+
+    tableQuery = """CREATE TABLE IF NOT EXISTS """ + tableName + """ 
+               (EntryID INTEGER PRIMARY KEY,
+                Name TEXT,
+                Phone TEXT
+                );"""
+
+    rows = [[1, "Jason Lee", "555-1212"],
+            [2, "Amanda Green", "555-0101"],
+            [3, "Jenna Jacobs", "555-9090"],
+            [4, "Alfredo Greer", "333-1234"],
+            [5, "Jules Landis", "555-2345"]]
+
+    connection = connect(database)
+
+    createTable(connection, tableQuery)
+
+    insertRows(database, tableName, rows)
+
+
+if __name__ == '__main__':
+    main()
